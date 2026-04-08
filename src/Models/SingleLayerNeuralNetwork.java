@@ -21,7 +21,7 @@ public record SingleLayerNeuralNetwork(List<Perceptron> neurons,
             Perceptron p = i.next();
             double alpha = a.next();
             double beta = b.next();
-            p.train(inputsAndLabels,maxEpochs,alpha,beta,true);
+            p.train(inputsAndLabels.stream().filter(myVector -> myVector.label),maxEpochs,alpha,beta,true);
         }
     }
 
