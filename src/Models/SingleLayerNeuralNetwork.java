@@ -9,11 +9,11 @@ public record SingleLayerNeuralNetwork(List<Perceptron> neurons,
                                        List<Double> alphas,
                                        List<Double> betas) {
 
-    public void trainLayer(List<MyVector> inputsAndLabels) {
+    public void trainLayer(HashMap<String,List<MyVector>> inputsAndLabels) {
         trainLayer(inputsAndLabels,50);
     }
 
-    public void trainLayer(List<MyVector> inputsAndLabels,int maxEpochs) {
+    public void trainLayer(HashMap<String,List<MyVector>> inputsAndLabels,int maxEpochs) {
         var i = neurons.iterator();
         var a = alphas.iterator();
         var b = betas.iterator();
@@ -21,7 +21,7 @@ public record SingleLayerNeuralNetwork(List<Perceptron> neurons,
             Perceptron p = i.next();
             double alpha = a.next();
             double beta = b.next();
-            p.train(inputsAndLabels.stream().filter(myVector -> myVector.label),maxEpochs,alpha,beta,true);
+            p.train(inputsAndLabels.get(p.label),maxEpochs,alpha,beta,true);
         }
     }
 
