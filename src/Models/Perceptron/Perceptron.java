@@ -4,6 +4,7 @@ import Helpers.EvaluationMetrics;
 import Models.MetricsModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -16,9 +17,9 @@ public class Perceptron {
     private double beta;
     public int label;
     public double lastNet;
-    private MetricsModel metricsModel;
+    public String name;
 
-    public Perceptron(int dimension, double threshold, double alpha, double beta) {
+    public Perceptron(int dimension, double threshold, double alpha, double beta,String name) {
         this.dimension = dimension;
         this.threshold = threshold;
         this.alpha = alpha;
@@ -28,8 +29,15 @@ public class Perceptron {
         for (int i = 0; i < dimension; i++) {
             this.weights[i] = rand.nextDouble(-1,1);
         }
+        this.name = name;
+        System.out.println("Perceptron \"" + name + "\" initialized with waits as follows:");
+        System.out.print("[");
+        for (int i = 0; i < weights.length; i++) {
+            System.out.printf("%.4f%s", weights[i], i < weights.length - 1 ? ", " : "");
+        }
+        System.out.println("]");
     }
-    public Perceptron(int dimension, double threshold, double alpha, double beta,String label){
+    public Perceptron(int dimension, double threshold, double alpha, double beta,int label){
         this.dimension = dimension;
         this.threshold = threshold;
         this.alpha = alpha;
@@ -54,7 +62,7 @@ public class Perceptron {
         return net >= 0 ? 1 : 0;
     }
 
-    public List<Double> train(List<MyVector> vectors, int epochs, Double learningRate,Double beta, boolean showResults) {
+    public List<MetricsModel> train(List<MyVector> vectors, int epochs, Double learningRate,Double beta, boolean showResults) {
         if (learningRate == null) {
             learningRate = alpha;
         }
@@ -64,8 +72,11 @@ public class Perceptron {
         List<Integer> guessed = new ArrayList<>();
         List<Double> accuracyHistory = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
+        List<MetricsModel> metrics = new ArrayList<>();
         while (mistake && epochsCount < epochs) {
+            Collections.shuffle(vectors);
             guessed.clear();
+            labels.clear();
             mistake = false;
             var iter = vectors.iterator();
             for (int i = 0; i < vectors.size(); i++) {
@@ -95,21 +106,27 @@ public class Perceptron {
             }
 
             epochsCount++;
-
-            MetricsModel result = EvaluationMetrics.measureAccuracy(guessed, labels);
+            MetricsModel result = EvaluationMetrics.measureAccuracy(labels,guessed);
+            metrics.add(result);
             accuracyHistory.add(result.precision());
 
             if (showResults) {
-                System.out.printf("Epoch %d: %.1f%%%n", epochsCount,result.precision());
+                System.out.printf("Epoch %d: A=%.2f%% P=%.2f%% R=%.2f%% F=%.2f%%%n",
+                        epochsCount,
+                        result.accuracy() * 100,
+                        result.precision() * 100,
+                        result.recall() * 100,
+                        result.f_Measure() * 100);
             }
 
             if (!mistake) break;
         }
 
-        return accuracyHistory;
+        //return accuracyHistory;
+        return metrics;
     }
 
-    public List<Double> train(List<MyVector> vectors, int epochs, Double learningRate, boolean showResults) {
+    public List<MetricsModel> train(List<MyVector> vectors, int epochs, Double learningRate, boolean showResults) {
         return train(vectors, epochs, learningRate, beta, showResults);
     }
 }

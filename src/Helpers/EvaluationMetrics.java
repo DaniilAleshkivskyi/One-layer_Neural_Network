@@ -16,18 +16,18 @@ public class EvaluationMetrics {
             }
         }
         ConfusionMatrix cM = ConfusionMatrix.getMatrix(realClasses, predictedClasses);
+        double a = (double) correct / realClasses.size();
         double p = calculatePrecision(cM);
         double r = calculateRecall(cM);
         double f = calculateF_Measure(p,r);
-        return new MetricsModel(p,r,f,String.format("===Measurements===\n%d/%d\nP = %d\nR = %d\nF = %d\n__________________", correct, realClasses.size(),p,r,f));
-
+        return new MetricsModel(a,p,r,f,String.format("===Measurements===\nAccuracy = %f\nPrecision = %f\nRecall = %f\nF_Measurement = %f\n__________________",a,p,r,f));
     }
 
     private static double calculatePrecision(ConfusionMatrix cM) {
-        return  (double) cM.pp() / (cM.pp() + cM.np());
+        return  (double) cM.tp() / (cM.tp() + cM.fp());
     }
     private static double calculateRecall(ConfusionMatrix cM) {
-        return (double)  cM.pp() / (cM.pp() + cM.pn());
+        return (double) cM.tp() / (cM.tp() + cM.fn());
     }
 
     private static double calculateF_Measure(double p,double r) {

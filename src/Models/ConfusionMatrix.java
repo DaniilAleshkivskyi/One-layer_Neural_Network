@@ -2,13 +2,13 @@ package Models;
 
 import java.util.List;
 
-public record ConfusionMatrix(int pp, int pn, int np, int nn) {
+public record ConfusionMatrix(int tp, int tn, int fp, int fn) {
 
     public static ConfusionMatrix getMatrix(List<Integer> realClasses, List<Integer> predictedClasses) {
-        int pp = 0;
-        int pn = 0;
-        int np = 0;
-        int nn = 0;
+        int tp = 0;
+        int tn = 0;
+        int fp = 0;
+        int fn = 0;
         var i = realClasses.iterator();
         var j = predictedClasses.iterator();
 
@@ -17,19 +17,19 @@ public record ConfusionMatrix(int pp, int pn, int np, int nn) {
             int ansJ = j.next();
             if (ansI == ansJ) {
                 if(ansI == 1) {
-                    pp++;
+                    tp++;
                 }else{
-                    nn++;
+                    tn++;
                 }
             }else{
-                if(ansI == 1 & ansJ == 0) {
-                    pn++;
+                if(ansI == 1 && ansJ == 0) {
+                    fn++;
                 }else {
-                    pn++;
+                    fp++;
                 }
             }
         }
 
-        return new ConfusionMatrix(pp,pn,np,nn);
+        return new ConfusionMatrix(tp, tn, fp, fn);
     }
 }

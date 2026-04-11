@@ -19,10 +19,10 @@ public record SingleLayerNeuralNetwork(List<Perceptron> neurons,
         for (Perceptron p : neurons) {
             double alpha = a.next();
             double beta = b.next();
-
+            System.out.println("===============\n===============\n===============\nPERCEPTRON " + p.name + "\n===============\n===============\n===============\n");
             List<MyVector> allData = new ArrayList<>();
             for (var entry : inputsAndLabels.entrySet()) {
-                int lbl = entry.getKey().equals(p.label) ? 1 : 0;
+                int lbl = entry.getKey().equals(p.name) ? 1 : 0;
                 for (MyVector v : entry.getValue()) {
                     allData.add(new MyVector(v.values(), lbl));
                 }
@@ -33,26 +33,24 @@ public record SingleLayerNeuralNetwork(List<Perceptron> neurons,
     }
 
     public String predict(MyVector vector) {
-        var i = neurons.iterator();
-        HashMap<String,Perceptron> nets = new HashMap<>();
-        while (i.hasNext()) {
-            Perceptron p = i.next();
+        HashMap<String, Perceptron> activated = new HashMap<>();
+
+        for (Perceptron p : neurons) {
             int res = p.predict(vector.values());
-            if(res == 1){
-                nets.put(p.label,p);
+            if (res == 1) {
+                activated.put(p.name, p);
             }
         }
-        if (nets.isEmpty()){
-            return "No prediction found";
-        }
-        double maxNet = 0;
-        Perceptron perceptron = null;
-        for (var p : nets.values()){
-            if (maxNet < p.lastNet){
+        Collection<Perceptron> candidates = activated.isEmpty() ? neurons : activated.values();
+
+        double maxNet = Double.NEGATIVE_INFINITY;
+        Perceptron best = null;
+        for (Perceptron p : candidates) {
+            if (p.lastNet > maxNet) {
                 maxNet = p.lastNet;
-                perceptron = p;
+                best = p;
             }
         }
-        return perceptron.label;
+        return best.name;
     }
 }
