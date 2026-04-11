@@ -13,15 +13,22 @@ public record SingleLayerNeuralNetwork(List<Perceptron> neurons,
         trainLayer(inputsAndLabels,50);
     }
 
-    public void trainLayer(HashMap<String,List<MyVector>> inputsAndLabels,int maxEpochs) {
-        var i = neurons.iterator();
+    public void trainLayer(HashMap<String, List<MyVector>> inputsAndLabels, int maxEpochs) {
         var a = alphas.iterator();
         var b = betas.iterator();
-        while (i.hasNext()) {
-            Perceptron p = i.next();
+        for (Perceptron p : neurons) {
             double alpha = a.next();
             double beta = b.next();
-            p.train(inputsAndLabels.get(p.label),maxEpochs,alpha,beta,true);
+
+            List<MyVector> allData = new ArrayList<>();
+            for (var entry : inputsAndLabels.entrySet()) {
+                int lbl = entry.getKey().equals(p.label) ? 1 : 0;
+                for (MyVector v : entry.getValue()) {
+                    allData.add(new MyVector(v.values(), lbl));
+                }
+            }
+
+            p.train(allData, maxEpochs, alpha, beta, true);
         }
     }
 

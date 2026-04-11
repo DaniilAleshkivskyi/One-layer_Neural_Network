@@ -14,7 +14,7 @@ public class Perceptron {
     private double threshold;
     private double alpha;
     private double beta;
-    public String label;
+    public int label;
     public double lastNet;
     private MetricsModel metricsModel;
 
